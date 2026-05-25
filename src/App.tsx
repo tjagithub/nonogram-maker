@@ -3,11 +3,11 @@ import { Fireworks } from './components/Fireworks'
 import { FlipTimer } from './components/FlipTimer'
 import { GameGrid } from './components/GameGrid'
 import { ImageSelector } from './components/ImageSelector'
+import { Button } from './components/ui/button'
 import { useGameState } from './hooks/useGameState'
 import { MainMenu } from './pages/MainMenu'
 import { SavedPuzzles } from './pages/SavedPuzzles'
 import { Scoreboard } from './pages/Scoreboard'
-import { Button } from './components/ui/button'
 import type { Page } from './pages/types'
 
 function App() {
@@ -39,12 +39,24 @@ function App() {
           <button
             className="text-white/40 hover:text-white/80 text-sm cursor-pointer bg-none border-none p-1"
             onClick={() => setSidebarOpen((o) => !o)}
-            type="button"
             title="Toggle sidebar"
+            type="button"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <line x1="9" y1="3" x2="9" y2="21" />
+            <svg
+              aria-label="Toggle sidebar"
+              fill="none"
+              height="18"
+              role="img"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect height="18" rx="2" width="18" x="3" y="3" />
+              <line x1="9" x2="9" y1="3" y2="21" />
             </svg>
           </button>
           <button
@@ -70,24 +82,55 @@ function App() {
                   <FlipTimer seconds={state.elapsed} />
                   <span className="attempts-display">Attempts: {state.attempts}</span>
                   <div className="btn-row">
-                    <Button variant="outline" size="sm" className="flex-1" onClick={handleClear}>Clear</Button>
-                    {state.playerGrid?.every((r) => r.every((c) => c !== 'empty'))
-                      ? <Button variant="default" size="sm" className="flex-1" disabled>Done</Button>
-                      : <Button variant="default" size="sm" className="flex-1" onClick={handleDone}
-                          style={{ background: 'rgba(var(--accent-rgb), 0.25)', borderColor: 'rgba(var(--accent-rgb), 0.4)' }}>
-                          Hint
-                        </Button>
-                    }
+                    <Button className="flex-1" onClick={handleClear} size="sm" variant="outline">
+                      Clear
+                    </Button>
+                    {state.playerGrid?.every((r) => r.every((c) => c !== 'empty')) ? (
+                      <Button className="flex-1" disabled size="sm" variant="default">
+                        Done
+                      </Button>
+                    ) : (
+                      <Button
+                        className="flex-1"
+                        onClick={handleDone}
+                        size="sm"
+                        style={{
+                          background: 'rgba(var(--accent-rgb), 0.25)',
+                          borderColor: 'rgba(var(--accent-rgb), 0.4)',
+                        }}
+                        variant="default"
+                      >
+                        Hint
+                      </Button>
+                    )}
                   </div>
                   <div className="btn-row">
-                    <Button variant="secondary" size="sm" className="flex-1"
-                      onClick={handleSolve} disabled={state.completed}
-                      style={!state.completed ? { background: 'rgba(46,125,50,0.25)', borderColor: 'rgba(46,125,50,0.4)' } : undefined}>
+                    <Button
+                      className="flex-1"
+                      disabled={state.completed}
+                      onClick={handleSolve}
+                      size="sm"
+                      style={
+                        !state.completed
+                          ? { background: 'rgba(46,125,50,0.25)', borderColor: 'rgba(46,125,50,0.4)' }
+                          : undefined
+                      }
+                      variant="secondary"
+                    >
                       Solve
                     </Button>
-                    <Button variant="secondary" size="sm" className="flex-1"
-                      onClick={handleStepSolveButton} disabled={state.completed}
-                      style={!state.completed ? { background: 'rgba(21,101,192,0.25)', borderColor: 'rgba(21,101,192,0.4)' } : undefined}>
+                    <Button
+                      className="flex-1"
+                      disabled={state.completed}
+                      onClick={handleStepSolveButton}
+                      size="sm"
+                      style={
+                        !state.completed
+                          ? { background: 'rgba(21,101,192,0.25)', borderColor: 'rgba(21,101,192,0.4)' }
+                          : undefined
+                      }
+                      variant="secondary"
+                    >
                       Step Solve
                     </Button>
                   </div>
@@ -103,12 +146,24 @@ function App() {
                 <div className="instructions">
                   <h3>How to play:</h3>
                   <ul>
-                    <li><strong>Left-click + drag</strong> to reveal cells</li>
-                    <li><strong>Right-click + drag</strong> to mark cells as X</li>
-                    <li>Click the <strong>▲ / ▶</strong> arrows on clue edges to X an entire row/column</li>
-                    <li><strong>Hint</strong> checks your progress and flashes wrong cells</li>
-                    <li><strong>Solve</strong> reveals the full image instantly</li>
-                    <li><strong>Step Solve</strong> animates through the solution cell by cell</li>
+                    <li>
+                      <strong>Left-click + drag</strong> to reveal cells
+                    </li>
+                    <li>
+                      <strong>Right-click + drag</strong> to mark cells as X
+                    </li>
+                    <li>
+                      Click the <strong>▲ / ▶</strong> arrows on clue edges to X an entire row/column
+                    </li>
+                    <li>
+                      <strong>Hint</strong> checks your progress and flashes wrong cells
+                    </li>
+                    <li>
+                      <strong>Solve</strong> reveals the full image instantly
+                    </li>
+                    <li>
+                      <strong>Step Solve</strong> animates through the solution cell by cell
+                    </li>
                     <li>Each mistake costs a life — too many and you lose!</li>
                   </ul>
                 </div>

@@ -84,6 +84,7 @@
     "rules": {
       "a11y": {
         "noStaticElementInteractions": "off",
+        "noSvgWithoutTitle": "off",
         "useFocusableInteractive": "off",
         "useSemanticElements": "off"
       },

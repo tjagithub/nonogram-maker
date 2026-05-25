@@ -61,18 +61,18 @@ test('back button returns to main menu', async ({ page }) => {
 test('generates a puzzle from an image upload', async ({ page }) => {
   await uploadAndGenerate(page)
   await expect(page.getByRole('button', { name: 'Hint' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Solve', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { exact: true, name: 'Solve' })).toBeVisible()
 })
 
 test('solve button reveals the puzzle', async ({ page }) => {
   await uploadAndGenerate(page)
-  await page.getByRole('button', { name: 'Solve', exact: true }).click()
+  await page.getByRole('button', { exact: true, name: 'Solve' }).click()
   await expect(page.getByText('Puzzle Complete!')).toBeVisible({ timeout: 5000 })
 })
 
 test('step solve button fills cells', async ({ page }) => {
   await uploadAndGenerate(page)
-  await page.getByRole('button', { name: 'Step Solve', exact: true }).click()
+  await page.getByRole('button', { exact: true, name: 'Step Solve' }).click()
   await page.waitForTimeout(1500)
   const filled = await page.locator('.cell-filled').count()
   expect(filled).toBeGreaterThan(0)
@@ -85,7 +85,7 @@ test('hint button shows Done when all cells are filled', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Hint' })).toBeVisible()
 
   // Fill every cell using Step Solve (runs to completion)
-  await page.getByRole('button', { name: 'Step Solve', exact: true }).click()
+  await page.getByRole('button', { exact: true, name: 'Step Solve' }).click()
 
   // Wait for Step Solve to finish (grid size * grid size * 50ms)
   await page.waitForTimeout(5000)
@@ -106,7 +106,7 @@ test('solves at 8x8 via step solve', async ({ page }) => {
   await expect(page.locator('.grid-container')).toBeVisible({ timeout: 10000 })
 
   // Step solve to complete
-  await page.getByRole('button', { name: 'Step Solve', exact: true }).click()
+  await page.getByRole('button', { exact: true, name: 'Step Solve' }).click()
   await expect(page.getByText('Puzzle Complete!')).toBeVisible({ timeout: 30000 })
 })
 
@@ -122,7 +122,7 @@ test('solves at 16x16 via step solve', async ({ page }) => {
   await expect(page.locator('.grid-container')).toBeVisible({ timeout: 10000 })
 
   // Step solve to complete
-  await page.getByRole('button', { name: 'Step Solve', exact: true }).click()
+  await page.getByRole('button', { exact: true, name: 'Step Solve' }).click()
   await expect(page.getByText('Puzzle Complete!')).toBeVisible({ timeout: 30000 })
 })
 
@@ -138,7 +138,7 @@ test('solves at 32x32 via instant solve', async ({ page }) => {
   await expect(page.locator('.grid-container')).toBeVisible({ timeout: 10000 })
 
   // Instant solve
-  await page.getByRole('button', { name: 'Solve', exact: true }).click()
+  await page.getByRole('button', { exact: true, name: 'Solve' }).click()
   await expect(page.getByText('Puzzle Complete!')).toBeVisible({ timeout: 5000 })
 })
 
@@ -153,7 +153,7 @@ test('natural solve: reads solution then clicks correct cells', async ({ page })
   await expect(page.locator('.grid-container')).toBeVisible({ timeout: 10000 })
 
   // Step solve fills cells one by one — let it complete
-  await page.getByRole('button', { name: 'Step Solve', exact: true }).click()
+  await page.getByRole('button', { exact: true, name: 'Step Solve' }).click()
   await expect(page.getByText('Puzzle Complete!')).toBeVisible({ timeout: 30000 })
 
   // Read which cells are filled via the "Puzzle Complete!" state
@@ -174,7 +174,7 @@ test('natural solve: reads solution then clicks correct cells', async ({ page })
   // Read the solution from the previous solve via evaluate
   // We know the puzzle is deterministic — same image + same size = same solution
   // Use Step Solve to fill cells (fast at 8×8 = 64 cells × 50ms = 3.2s)
-  await page.getByRole('button', { name: 'Step Solve', exact: true }).click()
+  await page.getByRole('button', { exact: true, name: 'Step Solve' }).click()
   await expect(page.getByText('Puzzle Complete!')).toBeVisible({ timeout: 10000 })
 })
 
@@ -199,7 +199,7 @@ test('full workflow: fails, hints, and solves', async ({ page }) => {
   await page.waitForTimeout(2000)
 
   // Solve to finish
-  await page.getByRole('button', { name: 'Solve', exact: true }).click()
+  await page.getByRole('button', { exact: true, name: 'Solve' }).click()
   await expect(page.getByText('Puzzle Complete!')).toBeVisible({ timeout: 5000 })
 })
 
@@ -228,6 +228,6 @@ test('clear button resets to welcome screen', async ({ page }) => {
   await page.locator('.grid-cell').first().click({ force: true })
   await page.waitForTimeout(500)
   // Clear resets everything back to welcome
-  await page.getByRole('button', { name: 'Clear', exact: true }).click()
+  await page.getByRole('button', { exact: true, name: 'Clear' }).click()
   await expect(page.getByText('Welcome to Nonogram Maker!')).toBeVisible({ timeout: 5000 })
 })

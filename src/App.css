@@ -175,8 +175,12 @@
   align-self: stretch;
   width: 260px;
   min-width: 260px;
-  transition: width 0.25s ease, min-width 0.25s ease, padding 0.25s ease, opacity 0.25s ease;
   overflow: hidden;
+  transition:
+    width 0.25s ease,
+    min-width 0.25s ease,
+    padding 0.25s ease,
+    opacity 0.25s ease;
 }
 
 .sidebar.collapsed {
@@ -188,11 +192,11 @@
 
 .sidebar-inner {
   display: flex;
+  flex: 1;
   flex-direction: column;
+  gap: 12px;
   padding: 16px;
   overflow-y: auto;
-  flex: 1;
-  gap: 12px;
 }
 
 .sidebar-controls {

@@ -8,7 +8,12 @@ export function MainMenu({ navigate }: MainMenuProps) {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-6 p-8">
       <div className="text-center mb-4 flex flex-col items-center gap-3">
-        <img src="/logo.png" alt="Nonogram Maker" className="w-16 h-16 rounded-2xl" style={{ imageRendering: 'pixelated' }} />
+        <img
+          alt="Nonogram Maker"
+          className="w-16 h-16 rounded-2xl"
+          src="/logo.png"
+          style={{ imageRendering: 'pixelated' }}
+        />
         <h1 className="text-4xl font-bold tracking-tight" style={{ color: 'var(--accent)' }}>
           Nonogram Maker
         </h1>

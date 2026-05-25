@@ -7,11 +7,12 @@ interface MainMenuProps {
 export function MainMenu({ navigate }: MainMenuProps) {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-6 p-8">
-      <div className="text-center mb-4">
+      <div className="text-center mb-4 flex flex-col items-center gap-3">
+        <img src="/logo.png" alt="Nonogram Maker" className="w-16 h-16 rounded-2xl" style={{ imageRendering: 'pixelated' }} />
         <h1 className="text-4xl font-bold tracking-tight" style={{ color: 'var(--accent)' }}>
           Nonogram Maker
         </h1>
-        <p className="text-white/40 text-sm mt-2">Create and solve picture puzzles</p>
+        <p className="text-white/40 text-sm mt-1">Create and solve picture puzzles</p>
       </div>
 
       <div className="flex flex-col gap-3 w-64">

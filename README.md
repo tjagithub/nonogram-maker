@@ -17,6 +17,8 @@ npm ci
 npm run dev        # http://localhost:5173
 npm run build
 npm run test:e2e   # Playwright; run `npx playwright install chromium` once
+npm run lint       # oxlint
+npm run format     # oxfmt
 ```
 
-React 19, TypeScript, Vite and Tailwind. The share code is one byte for the size followed by the cells packed 8 per byte, base64url-encoded (`src/utils/shareCode.ts`).
+Tooling is pinned in `mise.toml` (`mise install`, then `mise run check`). React 19, TypeScript, Vite and Tailwind. The share code is one byte for the size followed by the cells packed 8 per byte, base64url-encoded (`src/utils/shareCode.ts`).

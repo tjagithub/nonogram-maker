@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
+  base: "./",
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
@@ -15,5 +16,4 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
   },
-  envPrefix: ['VITE_', 'TAURI_'],
 })

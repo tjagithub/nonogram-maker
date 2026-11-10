@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Fireworks } from './components/Fireworks'
 import { FlipTimer } from './components/FlipTimer'
 import { GameGrid } from './components/GameGrid'
@@ -6,12 +6,17 @@ import { ImageSelector } from './components/ImageSelector'
 import { Button } from './components/ui/button'
 import { useGameState } from './hooks/useGameState'
 import { MainMenu } from './pages/MainMenu'
-import { SavedPuzzles } from './pages/SavedPuzzles'
-import { Scoreboard } from './pages/Scoreboard'
 import type { Page } from './pages/types'
+import { decodeGrid, gridToDataUrl, SHARE_PARAM, shareUrl } from './utils/shareCode'
+
+function sharedGrid(): boolean[][] | null {
+  const code = new URLSearchParams(location.search).get(SHARE_PARAM)
+  return code ? decodeGrid(code) : null
+}
 
 function App() {
-  const [page, setPage] = useState<Page>('menu')
+  const [page, setPage] = useState<Page>(() => (sharedGrid() ? 'create' : 'menu'))
+  const [copied, setCopied] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const {
     state,
@@ -24,13 +29,33 @@ function App() {
     handleCrossLine,
   } = useGameState()
 
+  useEffect(() => {
+    const grid = sharedGrid()
+    if (grid) handleGenerate(grid, gridToDataUrl(grid))
+    // Only the link the page was opened with; later puzzles are made in the UI.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const onGenerate = useCallback(
+    (grid: boolean[][], imageUrl: string) => {
+      handleGenerate(grid, imageUrl)
+      history.replaceState(null, '', shareUrl(grid))
+    },
+    [handleGenerate],
+  )
+
+  const copyLink = useCallback(async () => {
+    if (!state.solution) return
+    await navigator.clipboard.writeText(shareUrl(state.solution))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }, [state.solution])
+
   const mistakes = state.mistakes
   const bigX = Math.floor(mistakes.length / 5)
   const smallX = mistakes.length % 5
 
   if (page === 'menu') return <MainMenu navigate={setPage} />
-  if (page === 'saved') return <SavedPuzzles navigate={setPage} />
-  if (page === 'scoreboard') return <Scoreboard navigate={setPage} />
 
   return (
     <div className={`app theme-crimson`}>
@@ -76,11 +101,14 @@ function App() {
         <div className="glass-container">
           <aside className={`sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
             <div className="sidebar-inner">
-              <ImageSelector onGenerate={handleGenerate} />
+              <ImageSelector onGenerate={onGenerate} />
               {state.solution && (
                 <div className="sidebar-controls">
                   <FlipTimer seconds={state.elapsed} />
                   <span className="attempts-display">Attempts: {state.attempts}</span>
+                  <Button onClick={copyLink} size="sm" variant="outline">
+                    {copied ? 'Link copied' : 'Copy share link'}
+                  </Button>
                   <div className="btn-row">
                     <Button className="flex-1" onClick={handleClear} size="sm" variant="outline">
                       Clear
@@ -142,7 +170,7 @@ function App() {
             {!state.solution ? (
               <div className="welcome">
                 <h2>Welcome to Nonogram Maker!</h2>
-                <p>Select an image, adjust the difficulty, and generate a nonogram puzzle.</p>
+                <p>Upload any image and it becomes a nonogram. Share the link to challenge someone.</p>
                 <div className="instructions">
                   <h3>How to play:</h3>
                   <ul>

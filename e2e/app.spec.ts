@@ -1,13 +1,13 @@
-import { expect, test } from '@playwright/test'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { expect, type Page, test } from '@playwright/test'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const ASSETS = path.resolve(__dirname, '..', 'assets')
 const IMG = path.join(ASSETS, 'totoro.png')
 
-async function uploadAndGenerate(page: any) {
+async function uploadAndGenerate(page: Page) {
   await page.getByText('Create Puzzle').click()
   const fileInput = page.locator('input[type="file"]')
   await fileInput.setInputFiles(IMG)
@@ -26,23 +26,6 @@ test.beforeEach(async ({ page }) => {
 
 test('shows the app title and main menu', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('Nonogram Maker')
-  await expect(page.getByText('Create Puzzle')).toBeVisible()
-  await expect(page.getByText('Saved Puzzles')).toBeVisible()
-  await expect(page.getByText('Scoreboard')).toBeVisible()
-  await expect(page.getByText('Exit')).toBeVisible()
-})
-
-test('navigates to saved puzzles page and back', async ({ page }) => {
-  await page.getByText('Saved Puzzles').click()
-  await expect(page.getByText('No saved puzzles yet.')).toBeVisible()
-  await page.getByText('Back to Menu').click()
-  await expect(page.getByText('Create Puzzle')).toBeVisible()
-})
-
-test('navigates to scoreboard page and back', async ({ page }) => {
-  await page.getByText('Scoreboard').click()
-  await expect(page.getByText('No scores recorded yet.')).toBeVisible()
-  await page.getByText('Back to Menu').click()
   await expect(page.getByText('Create Puzzle')).toBeVisible()
 })
 
@@ -230,4 +213,19 @@ test('clear button resets to welcome screen', async ({ page }) => {
   // Clear resets everything back to welcome
   await page.getByRole('button', { exact: true, name: 'Clear' }).click()
   await expect(page.getByText('Welcome to Nonogram Maker!')).toBeVisible({ timeout: 5000 })
+})
+
+test('a shared link opens straight into the puzzle', async ({ page }) => {
+  await uploadAndGenerate(page)
+  const link = page.url()
+  expect(link).toContain('?nonogram=')
+  const fresh = await page.context().newPage()
+  await fresh.goto(link)
+  await expect(fresh.locator('.grid-container')).toBeVisible({ timeout: 10000 })
+  await expect(fresh.getByRole('button', { name: 'Hint' })).toBeVisible()
+})
+
+test('a broken share link falls back to the menu', async ({ page }) => {
+  await page.goto('/?nonogram=nope!')
+  await expect(page.getByText('Create Puzzle')).toBeVisible()
 })

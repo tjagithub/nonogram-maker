@@ -11,7 +11,7 @@ export function MainMenu({ navigate }: MainMenuProps) {
         <img
           alt="Nonogram Maker"
           className="w-16 h-16 rounded-2xl"
-          src="/logo.png"
+          src={`${import.meta.env.BASE_URL}logo.png`}
           style={{ imageRendering: 'pixelated' }}
         />
         <h1 className="text-4xl font-bold tracking-tight" style={{ color: 'var(--accent)' }}>
@@ -37,30 +37,6 @@ export function MainMenu({ navigate }: MainMenuProps) {
           type="button"
         >
           Create Puzzle
-        </button>
-
-        <button
-          className="w-full py-3 px-6 rounded-xl text-base font-semibold text-white/80 transition-all duration-200 border border-white/10 cursor-pointer hover:bg-white/5"
-          onClick={() => navigate('saved')}
-          type="button"
-        >
-          Saved Puzzles
-        </button>
-
-        <button
-          className="w-full py-3 px-6 rounded-xl text-base font-semibold text-white/80 transition-all duration-200 border border-white/10 cursor-pointer hover:bg-white/5"
-          onClick={() => navigate('scoreboard')}
-          type="button"
-        >
-          Scoreboard
-        </button>
-
-        <button
-          className="w-full py-3 px-6 rounded-xl text-base font-semibold text-white/50 transition-all duration-200 border border-white/5 cursor-pointer hover:bg-white/5"
-          onClick={() => window.close()}
-          type="button"
-        >
-          Exit
         </button>
       </div>
     </div>

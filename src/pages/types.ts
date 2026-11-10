@@ -1,1 +1,1 @@
-export type Page = 'menu' | 'create' | 'saved' | 'scoreboard'
+export type Page = 'menu' | 'create'

@@ -12,11 +12,6 @@ dist
 dist-ssr
 *.local
 
-# Tauri / Rust
-src-tauri/target/
-
-# Screenshots
-screenshots/
 
 # Environment
 .env
@@ -32,3 +27,5 @@ screenshots/
 *.njsproj
 *.sln
 *.sw?
+playwright-report/
+test-results/

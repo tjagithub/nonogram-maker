@@ -1,11 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
-import {
-  GRID_OPTIONS,
-  getAvailableGridSizes,
-  prepareCanvas,
-  renderGridOverlay,
-  sampleGrid,
-} from '../utils/imageProcessing'
+import { GRID_OPTIONS, getAvailableGridSizes, prepareCanvas, sampleGrid } from '../utils/imageProcessing'
+import { gridToDataUrl } from '../utils/shareCode'
 
 interface ImageSelectorProps {
   onGenerate: (grid: boolean[][], imageUrl: string) => void
@@ -20,9 +15,12 @@ export function ImageSelector({ onGenerate }: ImageSelectorProps) {
   const [gridSize, setGridSize] = useState(16)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [canvasSize, setCanvasSize] = useState<number | null>(null)
+  const [invert, setInvert] = useState(false)
 
-  const updatePreview = useCallback((img: HTMLImageElement, size: number, cs: number) => {
-    setPreviewUrl(renderGridOverlay(img, cs, size, 200))
+  const updatePreview = useCallback((img: HTMLImageElement, size: number, inv: boolean) => {
+    const { canvas, canvasSize: cs, rect } = prepareCanvas(img)
+    const { grid } = sampleGrid(canvas.getContext('2d')!, cs, size, { invert: inv, rect })
+    setPreviewUrl(gridToDataUrl(grid, '#e53935', Math.max(2, Math.floor(200 / size))))
   }, [])
 
   const handleFileChange = useCallback(
@@ -43,21 +41,21 @@ export function ImageSelector({ onGenerate }: ImageSelectorProps) {
           const available = getAvailableGridSizes(cs)
           const clamped = Math.min(gridSize, Math.max(...available))
           setGridSize(clamped)
-          updatePreview(img, clamped, cs)
+          updatePreview(img, clamped, invert)
         }
         img.src = url
       }
       reader.readAsDataURL(file)
     },
-    [gridSize, updatePreview],
+    [gridSize, invert, updatePreview],
   )
 
   const handleGridSizeChange = useCallback(
     (size: number) => {
       setGridSize(size)
-      if (imgRef.current && canvasSize) updatePreview(imgRef.current, size, canvasSize)
+      if (imgRef.current) updatePreview(imgRef.current, size, invert)
     },
-    [canvasSize, updatePreview],
+    [invert, updatePreview],
   )
 
   const handleGenerate = useCallback(() => {
@@ -65,11 +63,11 @@ export function ImageSelector({ onGenerate }: ImageSelectorProps) {
     const origUrl = originalUrlRef.current
     if (!canvasSize || !img || !origUrl) return
 
-    const { canvas } = prepareCanvas(img)
+    const { canvas, rect } = prepareCanvas(img)
     const ctx = canvas.getContext('2d')!
-    const result = sampleGrid(ctx, canvasSize, gridSize)
+    const result = sampleGrid(ctx, canvasSize, gridSize, { invert, rect })
     onGenerate(result.grid, origUrl)
-  }, [canvasSize, gridSize, onGenerate])
+  }, [canvasSize, gridSize, invert, onGenerate])
 
   const available = canvasSize ? getAvailableGridSizes(canvasSize) : [...GRID_OPTIONS]
   const clamped = available.includes(gridSize) ? gridSize : Math.max(...available)
@@ -85,13 +83,25 @@ export function ImageSelector({ onGenerate }: ImageSelectorProps) {
 
       {previewUrl && (
         <div className="preview-container">
-          <img alt="Preview" className="preview-img" src={previewUrl} />
+          <img alt="Preview" className="preview-img" src={previewUrl} style={{ imageRendering: 'pixelated' }} />
           <span className="preview-label">
             {gridSize}&times;{gridSize}
             {canvasSize ? ` on ${canvasSize}\u00d7${canvasSize}` : ''}
           </span>
         </div>
       )}
+
+      <label className="flex items-center gap-2 text-sm text-white/60">
+        <input
+          checked={invert}
+          onChange={(e) => {
+            setInvert(e.target.checked)
+            if (imgRef.current) updatePreview(imgRef.current, gridSize, e.target.checked)
+          }}
+          type="checkbox"
+        />
+        Swap filled and empty
+      </label>
 
       <div className="control-group">
         <span className="control-group-label">Grid Size (Difficulty)</span>

@@ -1,11 +1,15 @@
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { expect, type Page, test } from '@playwright/test'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const ASSETS = path.resolve(__dirname, '..', 'assets')
-const IMG = path.join(ASSETS, 'totoro.png')
+// An opaque picture (dark shapes on white), the case that used to produce a solid grid.
+const IMG = {
+  buffer: Buffer.from(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#fff"/>' +
+      '<circle cx="128" cy="128" r="90" fill="#111"/><circle cx="96" cy="108" r="16" fill="#fff"/>' +
+      '<circle cx="160" cy="108" r="16" fill="#fff"/><rect x="88" y="156" width="80" height="14" fill="#fff"/></svg>',
+  ),
+  mimeType: 'image/svg+xml',
+  name: 'face.svg',
+}
 
 async function uploadAndGenerate(page: Page) {
   await page.getByText('Create Puzzle').click()
@@ -56,9 +60,7 @@ test('solve button reveals the puzzle', async ({ page }) => {
 test('step solve button fills cells', async ({ page }) => {
   await uploadAndGenerate(page)
   await page.getByRole('button', { exact: true, name: 'Step Solve' }).click()
-  await page.waitForTimeout(1500)
-  const filled = await page.locator('.cell-filled').count()
-  expect(filled).toBeGreaterThan(0)
+  await expect(page.locator('.cell-filled').first()).toBeVisible({ timeout: 10000 })
 })
 
 test('hint button shows Done when all cells are filled', async ({ page }) => {
@@ -171,9 +173,9 @@ test('full workflow: fails, hints, and solves', async ({ page }) => {
   await page.getByText('Generate Puzzle').click()
   await expect(page.locator('.grid-container')).toBeVisible({ timeout: 10000 })
 
-  // Make mistakes
+  // Make a few mistakes (the 8x8 limit is 5, so stay under it)
   const cells = page.locator('.grid-cell')
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 3; i++) {
     await cells.nth(i).click({ force: true })
   }
 
